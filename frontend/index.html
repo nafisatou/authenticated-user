@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Upload</title>
+    <style>
+        body { font-family: system-ui, sans-serif; padding: 24px; max-width: 720px; margin: 0 auto; }
+        .progress { width: 100%; height: 10px; background: #eee; border-radius: 4px; overflow: hidden; margin-top: 12px; }
+        .progress-bar { height: 100%; background: #4caf50; width: 0; transition: width 0.1s linear; }
+        label { display:block; margin: 8px 0 4px; font-weight: 600; }
+        button { margin-top: 12px; padding: 8px 14px; }
+        #response { margin-top: 12px; white-space: pre-wrap; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    </style>
+</head>
+<body>
+    <h1>Upload File</h1>
+
+    <label for="file">File</label>
+    <input type="file" id="file" />
+    <button id="upload-btn">Upload</button>
+
+    <div id="progress" class="progress">
+        <div class="progress-bar" id="progress-bar"></div>
+    </div>
+
+    <pre id="response"></pre>
+
+    <script>
+        const uploadBtn = document.getElementById('upload-btn');
+        const fileInput = document.getElementById('file');
+        const progressBar = document.getElementById('progress-bar');
+        const responseEl = document.getElementById('response');
+
+        uploadBtn.addEventListener('click', () => {
+            const file = fileInput.files[0];
+            if (!file) {
+                alert('Please select a file first.');
+                return;
+            }
+
+            const form = new FormData();
+            form.append('file', file);
+
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', '/upload', true);
+
+            xhr.upload.onprogress = (e) => {
+                if (e.lengthComputable) {
+                    const pct = (e.loaded / e.total) * 100;
+                    progressBar.style.width = pct + '%';
+                }
+            };
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    responseEl.textContent = xhr.responseText || 'No response';
+                }
+            };
+
+            xhr.onerror = function () {
+                responseEl.textContent = 'Network error';
+            };
+
+            xhr.send(form);
+        });
+    </script>
+</body>
+</html>

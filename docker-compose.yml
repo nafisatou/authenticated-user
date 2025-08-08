@@ -1,0 +1,11 @@
+services:
+  upload-proxy:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - BIND_ADDR=0.0.0.0:8080
+    ports:
+      - "8082:8080"
+    volumes:
+      - ./uploads:/app/uploads
